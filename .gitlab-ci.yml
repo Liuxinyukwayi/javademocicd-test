@@ -7,7 +7,7 @@ variables:
   KUBECONFIG: /etc/deploy/config
   MAVEN_OPTS: "-Dmaven.repo.local=/opt/cache/.m2/repository"
 mvn_build_job:
-  image: maven:3.6.2-jdk-14
+  image: maven
   stage: package
   tags:
     - k8s-runner
