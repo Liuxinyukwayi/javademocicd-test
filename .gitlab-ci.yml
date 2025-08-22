@@ -26,7 +26,7 @@ mvn_build_job:
 docker_build_job:
   image:
     name: gcr.io/kaniko-project/executor:latest
-    entrypoint: [""]
+    entrypoint: [""]   # 👈 禁用默认 entrypoint，不让 Runner 找 sh
   stage: docker_build
   tags:
     - k8s-runner
