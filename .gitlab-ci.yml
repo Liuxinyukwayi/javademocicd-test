@@ -38,17 +38,8 @@ docker_build_job:
   tags:
     - k8s-runner
   script:
-    # 1. 写入 Docker Registry 凭证
-    - |
-      echo "{\"auths\":{\"crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com\":{
-        \"username\":\"$DOCKER_USER\",
-        \"password\":\"$DOCKER_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    # 2. 调用 Kaniko 构建并推送镜像
-    - >
-      /kaniko/executor
-      --context $CI_PROJECT_DIR
-      --dockerfile $CI_PROJECT_DIR/Dockerfile
-      --destination=crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/javademo:$CI_PIPELINE_ID
+    - echo "{\"auths\":{\"crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com\":{\"username\":\"$DOCKER_USER\",\"password\":\"$DOCKER_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination=crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/wenhegantian/javademo:$CI_PIPELINE_ID
 
 deploy_k8s_job:
   image: registry.cn-hangzhou.aliyuncs.com/haoshuwei24/kubectl:1.16.6
