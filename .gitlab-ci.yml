@@ -24,18 +24,15 @@ mvn_build_job:
     expire_in: 1h   # 可以设置保存多久
 
 docker_build_job:
-  image: docker:latest
+  image:
+    name: gcr.io/kaniko-project/executor:latest
+    entrypoint: [""]
   stage: docker_build
   tags:
     - k8s-runner
-  dependencies:   # 指定依赖上一个 job 的 artifacts
-    - mvn_build_job
   script:
-    - echo "🐳 开始构建 Docker 镜像..."
-    - docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com
-    - ls -l target
-    - docker build -t crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/wenhegantian/javademo:$CI_PIPELINE_ID .
-    - docker push crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/wenhegantian/javademo:$CI_PIPELINE_ID
+    - echo "{\"auths\":{\"crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com\":{\"username\":\"$DOCKER_USER\",\"password\":\"$DOCKER_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination=crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/wenhegantian/javademo:$CI_PIPELINE_ID
 
 deploy_k8s_job:
   image: registry.cn-hangzhou.aliyuncs.com/haoshuwei24/kubectl:1.16.6
