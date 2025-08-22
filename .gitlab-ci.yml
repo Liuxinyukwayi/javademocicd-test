@@ -33,7 +33,7 @@ mvn_build_job:
     expire_in: 1h
 
 docker_build_job:
-  image: gcr.io/kaniko-project/executor:latest
+  image: gcr.io/kaniko-project/executor:debug
   stage: docker_build
   tags:
     - k8s-runner
