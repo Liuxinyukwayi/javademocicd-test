@@ -25,7 +25,7 @@ mvn_build_job:
 
 docker_build_job:
   image:
-    name: gcr.io/kaniko-project/executor:latest
+    name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]  # 禁用默认 shell，直接执行脚本
   stage: docker_build
   tags:
