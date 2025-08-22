@@ -1,0 +1,46 @@
+stages:
+  - package
+  - docker_build
+  - deploy_k8s
+
+variables:
+  KUBECONFIG: /etc/deploy/config
+  MAVEN_OPTS: "-Dmaven.repo.local=/root/.m2/repository"
+
+mvn_build_job:
+  image: maven:3.6.2-jdk-14
+  stage: package
+  tags:
+    - k8s-runner
+  script:
+    - echo "🚀 开始 Maven 构建..."
+    - mvn clean package -B -DskipTests
+    - ls -l target
+    # 将构建产物复制出来，方便后续 Docker 构建
+    - cp target/*.jar target/app.jar || cp target/*.war target/app.war
+
+docker_build_job:
+  image: docker:latest
+  stage: docker_build
+  tags:
+    - k8s-runner
+  script:
+    - echo "🐳 开始构建 Docker 镜像..."
+    - docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com
+    - ls -l target
+    - docker build -t crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/wenhegantian/javademo:$CI_PIPELINE_ID .
+    - docker push crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/wenhegantian/javademo:$CI_PIPELINE_ID
+
+deploy_k8s_job:
+  image: registry.cn-hangzhou.aliyuncs.com/haoshuwei24/kubectl:1.16.6
+  stage: deploy_k8s
+  tags:
+    - k8s-runner
+  script:
+    - echo "🚀 部署到 K8s 集群..."
+    - mkdir -p /etc/deploy
+    - echo $kube_config | base64 -d > $KUBECONFIG
+    - sed -i "s/IMAGE_TAG/$CI_PIPELINE_ID/g" deployment.yaml
+    - cat deployment.yaml
+    - kubectl apply -f deployment.yaml
+
