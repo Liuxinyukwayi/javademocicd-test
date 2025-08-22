@@ -30,7 +30,7 @@ docker_build_job:
     - k8s-runner
   script:
     - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com
-    - mkdir target
+    - mkdir -p target
     - cp /root/.m2/repository/demo.war target/demo.war
     - docker build -t crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/javademo:$CI_PIPELINE_ID .
     - docker push crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/javademo:$CI_PIPELINE_ID
