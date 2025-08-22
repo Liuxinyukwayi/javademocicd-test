@@ -31,8 +31,10 @@ docker_build_job:
   tags:
     - k8s-runner
   script:
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile \
-      --destination=crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/wenhegantian/javademo:$CI_PIPELINE_ID
+    - /kaniko/executor \
+       --context $CI_PROJECT_DIR \
+       --dockerfile $CI_PROJECT_DIR/Dockerfile \
+       --destination=crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/wenhegantian/javademo:$CI_PIPELINE_ID
 
 deploy_k8s_job:
   image: registry.cn-hangzhou.aliyuncs.com/haoshuwei24/kubectl:1.16.6
