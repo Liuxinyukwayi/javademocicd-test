@@ -16,14 +16,20 @@ mvn_build_job:
     - echo "🚀 开始 Maven 构建..."
     - mvn clean package -B -DskipTests
     - ls -l target
-    # 将构建产物复制出来，方便后续 Docker 构建
     - cp target/*.jar target/app.jar || cp target/*.war target/app.war
+  artifacts:
+    paths:
+      - target/app.jar
+      - target/app.war
+    expire_in: 1h   # 可以设置保存多久
 
 docker_build_job:
   image: docker:latest
   stage: docker_build
   tags:
     - k8s-runner
+  dependencies:   # 指定依赖上一个 job 的 artifacts
+    - mvn_build_job
   script:
     - echo "🐳 开始构建 Docker 镜像..."
     - docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com
@@ -43,4 +49,5 @@ deploy_k8s_job:
     - sed -i "s/IMAGE_TAG/$CI_PIPELINE_ID/g" deployment.yaml
     - cat deployment.yaml
     - kubectl apply -f deployment.yaml
+
 
