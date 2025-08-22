@@ -16,22 +16,32 @@ mvn_build_job:
     - echo "🚀 开始 Maven 构建..."
     - mvn clean package -B -DskipTests
     - ls -l target
-    - cp target/*.jar target/app.jar || cp target/*.war target/app.war
+    # ✅ 避免“同文件”报错
+    - |
+      if ls target/*.jar 1>/dev/null 2>&1; then
+        cp $(ls target/*.jar | head -n 1) target/app.jar
+      elif ls target/*.war 1>/dev/null 2>&1; then
+        cp $(ls target/*.war | head -n 1) target/app.war
+      else
+        echo "❌ 未找到 jar 或 war 包"
+        exit 1
+      fi
   artifacts:
     paths:
       - target/app.jar
       - target/app.war
-    expire_in: 1h   # 可以设置保存多久
+    expire_in: 1h
 
 docker_build_job:
   image: docker:latest
   stage: docker_build
   tags:
     - k8s-runner
+  dependencies:
+    - mvn_build_job   # ✅ 确保能拿到上一步的产物
   script:
     - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com
-    - mkdir -p target
-    - cp target/*.jar target/app.jar || cp target/*.war target/app.war
+    - ls -l target
     - docker build -t crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/javademo:$CI_PIPELINE_ID .
     - docker push crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/javademo:$CI_PIPELINE_ID
 
