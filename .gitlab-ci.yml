@@ -26,13 +26,13 @@ mvn_build_job:
 docker_build_job:
   image:
     name: gcr.io/kaniko-project/executor:latest
-    entrypoint: [""]   # 👈 禁用默认 entrypoint，不让 Runner 找 sh
+    entrypoint: [""]  # 禁用默认 shell，直接执行脚本
   stage: docker_build
   tags:
     - k8s-runner
   script:
-    - echo "{\"auths\":{\"crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com\":{\"username\":\"$DOCKER_USER\",\"password\":\"$DOCKER_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination=crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/wenhegantian/javademo:$CI_PIPELINE_ID
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile \
+      --destination=crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/wenhegantian/javademo:$CI_PIPELINE_ID
 
 deploy_k8s_job:
   image: registry.cn-hangzhou.aliyuncs.com/haoshuwei24/kubectl:1.16.6
