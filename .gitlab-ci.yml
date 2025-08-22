@@ -31,7 +31,7 @@ docker_build_job:
   script:
     - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com
     - mkdir -p target
-    - cp /root/.m2/repository/demo.war target/demo.war
+    - cp target/*.jar target/app.jar || cp target/*.war target/app.war
     - docker build -t crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/javademo:$CI_PIPELINE_ID .
     - docker push crpi-29ns4nxq5xxuk3v4.cn-hangzhou.personal.cr.aliyuncs.com/javademo:$CI_PIPELINE_ID
 
