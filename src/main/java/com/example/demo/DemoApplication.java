@@ -12,7 +12,7 @@ public class DemoApplication {
 //test
 	@GetMapping("/")
 	public String home() {
-		return "Spring is here!";
+		return "Spring is here![v2]";
 	}
 
 	public static void main(String[] args) {
